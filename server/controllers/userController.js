@@ -1,4 +1,6 @@
+import cloudinary from "../lib/cloudinary";
 import generateToken from "../lib/utils";
+import User from "../models/User";
 
 const signup = async(req, res) =>{
     const {fullName, email, password, bio} = req.body;
@@ -53,4 +55,28 @@ const login = async(req, res) => {
     }
 }
 
-export {signup, login};
+const checkAuth = (req, res) => {
+    res.json({success: true, user: req.user});
+}
+
+const updateProfile = async (req, res) => {
+    try {
+     const {profilePic, fullName, bio} = req.body;
+     const userId = req.user._id;
+     let updatedUser;
+
+     if(!profilePic) {
+         updatedUser = await User.findByIdAndUpdate(userId, {bio, fullName}, {new: true});
+    } else {
+         const upload = cloudinary.uploader.upload(profilePic);
+         updatedUser = await User.findByIdAndUpdate(userId, {profilePic: await upload.secure_url, bio }, {new: true})
+    }
+    res.json({success: true, user: updatedUser, message: "Profile updated successfully"});
+   }
+    catch (error) {
+        console.error("Error updating profile:", error);
+        res.json({success: false, message: error.message});
+    }
+}
+
+export {signup, login, checkAuth, updateProfile};

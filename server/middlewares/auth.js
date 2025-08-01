@@ -24,8 +24,5 @@ const protectRoute = async (req, res, next) => {
     }
 }
 
-const checkAuth = (req, res) => {
-    res.json({success: true, user: req.user});
-}
 
-export { protectRoute, checkAuth };
+export { protectRoute};
