@@ -1,6 +1,7 @@
-import cloudinary from "../lib/cloudinary";
-import generateToken from "../lib/utils";
-import User from "../models/User";
+import cloudinary from "../lib/cloudinary.js";
+import generateToken from "../lib/utils.js";
+import Message from "../models/Message.js";
+import User from "../models/User.js";
 
 const signup = async(req, res) =>{
     const {fullName, email, password, bio} = req.body;
