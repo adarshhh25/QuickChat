@@ -2,6 +2,7 @@ import cloudinary from "../lib/cloudinary.js";
 import generateToken from "../lib/utils.js";
 import Message from "../models/Message.js";
 import User from "../models/User.js";
+import bcrypt from 'bcrypt';
 
 const signup = async(req, res) =>{
     const {fullName, email, password, bio} = req.body;
@@ -19,12 +20,12 @@ const signup = async(req, res) =>{
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const newUser = await User.create({
-            fullName, email, hashedPassword, bio
+            fullName, email, password: hashedPassword, bio
         })
 
         const token = generateToken(newUser._id);
 
-        res.json({success: true, user: newUser, token,message: "User created successfully"}); 
+        res.json({success: true, user: newUser, token, message: "User created successfully"}); 
 
     } catch (error) {
         console.error("Error during signup:", error);
@@ -48,7 +49,7 @@ const login = async(req, res) => {
 
         const token = generateToken(userData._id);
 
-        res.json({success: true, user: newUser, token, message: "Login successful",}); 
+        res.json({success: true, user: userData, token, message: "Login successful",}); 
 
     } catch (error) {
         console.error("Error during login:", error);
