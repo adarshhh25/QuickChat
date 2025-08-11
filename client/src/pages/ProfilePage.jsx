@@ -51,7 +51,7 @@ const ProfilePage = () => {
         </button>
       </form>
       <img className={`max-w-44 aspect-square rounded-full mx-10 mx-sm:mt-10 ${selectedImg && 'rounded-full'}`}
-      src={assets.logo_icon} alt="" />
+      src={authUser?.profilePic || assets.logo_icon} alt="" />
      </div>
     </div>
   )

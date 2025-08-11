@@ -70,7 +70,7 @@ const updateProfile = async (req, res) => {
      if(!profilePic) {
          updatedUser = await User.findByIdAndUpdate(userId, {bio, fullName}, {new: true});
     } else {
-         const upload = cloudinary.uploader.upload(profilePic);
+         const upload = await cloudinary.uploader.upload(profilePic);
          updatedUser = await User.findByIdAndUpdate(userId, {profilePic: await upload.secure_url, bio }, {new: true})
     }
     res.json({success: true, user: updatedUser, message: "Profile updated successfully"});
