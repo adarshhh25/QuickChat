@@ -3,7 +3,7 @@ import { useState } from "react";
 import { createContext } from "react";
 import { AuthContext } from "./AuthContext";
 import toast from "react-hot-toast";
-import { data } from "react-router-dom";
+import { useEffect } from "react";
 
 export const ChatContext = createContext();
 
@@ -52,7 +52,7 @@ export const ChatProvider = ({children}) => {
                 toast.error(data.message)
             }
         } catch (error) {
-            toast.error(data.message);
+            toast.error(error.message);
         }
     }
 
@@ -61,14 +61,15 @@ export const ChatProvider = ({children}) => {
         if(!socket) return;
 
         socket.on("newMessage", (newMessage) => {
+            console.log("Socket connected")
             if(selectedUser && newMessage.senderId === selectedUser._id) {
                 newMessage.seen = true;
-                sendMessage((prevMessages) => [...prevMessages, newMessage]);
+                setMessages((prevMessages) => [...prevMessages, newMessage]);
                 axios.put(`/api/messages/mark/${newMessage._id}`);
             } else {
                 setUnseenMessages((prevUnseenMessages) => ({
                    ...prevUnseenMessages, [newMessage.senderId] :
-                     prevUnseenMessages[newMessage.senderId] ? prevUnseenMessages[newMessage.senderId] + 1 : 1
+                   prevUnseenMessages[newMessage.senderId] ? prevUnseenMessages[newMessage.senderId] + 1 : 1
                 }))
             }
         })
@@ -77,12 +78,25 @@ export const ChatProvider = ({children}) => {
 
     //function to unsubscribe from messages
 
-    const unsubscriberFromMessages = () => {
+    const unsubscribeFromMessages = () => {
         if(socket) socket.off("newMessage")
     }
 
-      const value = {
+    useEffect(() => {
+        subscribeToMessages();
+        return () => unsubscribeFromMessages();
+    }, [socket, selectedUser])
 
+      const value = {
+         messages,
+         users,
+         selectedUser,
+         getUsers,
+         setMessages,
+         sendMessage,
+         setSelectedUser,
+         unseenMessages,
+         setUnseenMessages
       }
 
       return (
